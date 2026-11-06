@@ -1,0 +1,44 @@
+{% extends "games/editor_base.html" %}
+{% block title %}Rooms for {{ game.title }} | SmartScumm editor{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <h1 class="h2 mb-0">Rooms for {{ game.title }}</h1>
+  <nav aria-label="Game editor sections">
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-assets' game.pk %}">Images</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-characters' game.pk %}">Characters</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-items' game.pk %}">Items</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-actions' game.pk %}">Actions</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-flags' game.pk %}">Flags</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-readiness' game.pk %}">Readiness</a>
+  </nav>
+</div>
+<div class="row g-4">
+  <section class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5 card-title">Add a room</h2>
+        <form method="post" class="editor-form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Create room</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <section class="col-lg-8">
+    <h2 class="h5">Existing rooms</h2>
+    <ol class="list-group list-group-numbered">
+      {% for room in rooms %}
+        <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+          <a href="{% url 'editor-room' game.pk room.pk %}">{{ room.name }}</a>
+          <small class="text-body-secondary">
+            {% if room.background %}{{ room.background.name }}{% else %}No background{% endif %}
+          </small>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No rooms yet.</li>
+      {% endfor %}
+    </ol>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "games/editor_base.html" %}
+{% block title %}Puzzle flags for {{ game.title }} | SmartScumm editor{% endblock %}
+{% block content %}
+<h1 class="h2">Puzzle flags for {{ game.title }}</h1>
+<p><a href="{% url 'editor-actions' game.pk %}">Actions</a> · <a href="{% url 'editor-rooms' game.pk %}">Rooms</a> · <a href="{% url 'editor-readiness' game.pk %}">Readiness</a></p>
+<p class="text-body-secondary">Flags start false. Actions can require or set them; keys are unique within this game.</p>
+<div class="row g-4">
+  <section class="col-lg-5">
+    <div class="card"><div class="card-body">
+      <h2 class="h5">Add a flag</h2>
+      <form method="post" class="editor-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Add flag</button>
+      </form>
+    </div></div>
+  </section>
+  <section class="col-lg-7">
+    <h2 class="h5">Existing flags</h2>
+    <ul class="list-group">
+      {% for flag in flags %}
+        <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+          <span><strong>{{ flag.key }}</strong> {{ flag.description }}</span>
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'editor-flag-edit' game.pk flag.pk %}">Edit</a>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No puzzle flags yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

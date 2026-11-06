@@ -1,0 +1,17 @@
+{% extends "games/editor_base.html" %}
+{% block title %}Edit {{ flag.key }} | SmartScumm editor{% endblock %}
+{% block content %}
+<h1 class="h2">Edit flag {{ flag.key }}</h1>
+<p><a href="{% url 'editor-flags' flag.game_id %}">All flags</a></p>
+<div class="card"><div class="card-body">
+  <form method="post" class="editor-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary" type="submit">Save flag</button>
+  </form>
+  <form method="post" action="{% url 'editor-flag-delete' flag.game_id flag.pk %}" class="mt-3">
+    {% csrf_token %}
+    <button class="btn btn-outline-danger" type="submit">Delete flag</button>
+  </form>
+</div></div>
+{% endblock %}

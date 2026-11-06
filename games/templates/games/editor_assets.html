@@ -1,0 +1,55 @@
+{% extends "games/editor_base.html" %}
+{% block title %}Images for {{ game.title }} | SmartScumm editor{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h2 mb-0">Images for {{ game.title }}</h1>
+  <nav aria-label="Game editor sections">
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-rooms' game.pk %}">Rooms</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-characters' game.pk %}">Characters</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-items' game.pk %}">Items</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-readiness' game.pk %}">Readiness</a>
+  </nav>
+</div>
+<p class="alert {% if game.is_published %}alert-success{% else %}alert-info{% endif %}">{% if game.is_published %}Published{% else %}Draft: images are visible only to staff until published.{% endif %}</p>
+<p>Upload a PNG, JPEG, GIF, or WebP image. Assign it to a room, character, or item in this editor.</p>
+<div class="row g-4">
+  <section class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5 card-title">Upload image</h2>
+        <form method="post" enctype="multipart/form-data" class="editor-form">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Upload image</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <section class="col-lg-8">
+    <h2 class="h5">Uploaded images</h2>
+    <ul class="row row-cols-1 row-cols-md-2 g-3 list-unstyled">
+      {% for asset in assets %}
+        <li class="col">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 card-title">{{ asset.name }}</h3>
+              <img class="asset-preview mb-3" src="{% url 'editor-asset-preview' game.pk asset.pk %}" alt="Preview of {{ asset.name }}">
+              <a class="btn btn-outline-primary btn-sm" href="{% url 'editor-asset-edit' game.pk asset.pk %}">Rename</a>
+              {% if asset.background_rooms.all or asset.portrait_characters.all or asset.item_images.all %}
+                <span class="d-block text-body-secondary mt-2">In use: remove references before deleting.</span>
+              {% else %}
+                <form method="post" action="{% url 'editor-asset-delete' game.pk asset.pk %}" class="mt-2">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Delete {{ asset.name }}</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </li>
+      {% empty %}
+        <li class="col">No images uploaded yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

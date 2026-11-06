@@ -1,0 +1,36 @@
+{% extends "games/editor_base.html" %}
+{% block title %}Actions for {{ game.title }} | SmartScumm editor{% endblock %}
+{% block content %}
+<h1 class="h2">Actions for {{ game.title }}</h1>
+<p><a href="{% url 'editor-flags' game.pk %}">Puzzle flags</a> · <a href="{% url 'editor-rooms' game.pk %}">Rooms and hotspots</a> · <a href="{% url 'editor-items' game.pk %}">Items</a> · <a href="{% url 'editor-readiness' game.pk %}">Readiness</a></p>
+<p class="text-body-secondary">Choose exactly one hotspot or item target. A Use action may specify an input item. Optional required item and flag conditions must both hold; the first matching rule by order (then ID) shows its text and applies its item/flag effects. Pick up requires a hotspot and an item to grant. See the README for matching rules.</p>
+<div class="row g-4">
+  <section class="col-xl-5">
+    <div class="card"><div class="card-body">
+      <h2 class="h5">Add an action</h2>
+      <form method="post" class="editor-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Add action</button>
+      </form>
+    </div></div>
+  </section>
+  <section class="col-xl-7">
+    <h2 class="h5">Ordered actions</h2>
+    <ol class="list-group list-group-numbered">
+      {% for action in actions %}
+        <li class="list-group-item d-flex justify-content-between align-items-center gap-2">
+          <span><strong>{{ action.get_verb_display }}</strong>
+            {% if action.target_hotspot %}{{ action.target_hotspot.room.name }} / {{ action.target_hotspot.label }}{% else %}{{ action.target_item.name }}{% endif %}
+            {% if action.input_item %} with {{ action.input_item.name }}{% endif %}
+            <small class="text-body-secondary">(order {{ action.order }})</small>
+          </span>
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'editor-action-edit' game.pk action.pk %}">Edit</a>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No actions yet.</li>
+      {% endfor %}
+    </ol>
+  </section>
+</div>
+{% endblock %}

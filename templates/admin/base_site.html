@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrahead %}
+  {{ block.super }}
+  <link rel="icon" type="image/svg+xml" href="{% static 'games/scummvm_icon.svg' %}">
+{% endblock %}
+{% block branding %}
+  <h1 id="site-name"><a href="{% url 'admin:index' %}"><img src="{% static 'games/scummvm_icon.svg' %}" alt="" aria-hidden="true" width="32" height="32"> SmartScumm administration</a></h1>
+{% endblock %}

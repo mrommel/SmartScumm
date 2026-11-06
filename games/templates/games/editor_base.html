@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SmartScumm editor{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'games/scummvm_icon.svg' %}">
+  <link rel="stylesheet" href="{% static 'games/vendor/bootstrap-5.3.8.min.css' %}">
+  <link rel="stylesheet" href="{% static 'games/editor.css' %}">
+</head>
+<body class="bg-body-tertiary">
+  <header class="bg-white border-bottom">
+    <nav class="container-xxl d-flex flex-wrap align-items-center gap-3 py-2" aria-label="Editor navigation">
+      <a class="navbar-brand d-flex align-items-center gap-2 me-auto" href="{% url 'editor-games' %}">
+        <img src="{% static 'games/scummvm_icon.svg' %}" alt="" aria-hidden="true" width="32" height="32">
+        <span>SmartScumm editor</span>
+      </a>
+      <a class="nav-link" href="{% url 'editor-games' %}">Games</a>
+      <a class="nav-link" href="{% url 'admin:index' %}">Django admin</a>
+    </nav>
+  </header>
+  <main class="container-xxl py-4">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

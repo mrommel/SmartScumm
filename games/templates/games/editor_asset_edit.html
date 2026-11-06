@@ -1,0 +1,16 @@
+{% extends "games/editor_base.html" %}
+{% block title %}Rename {{ asset.name }} | SmartScumm editor{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h1 class="h4 card-title">Rename {{ asset.name }}</h1>
+    <img class="asset-preview mb-3" src="{% url 'editor-asset-preview' asset.game_id asset.pk %}" alt="Preview of {{ asset.name }}">
+    <form method="post" class="editor-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Save name</button>
+      <a class="btn btn-link" href="{% url 'editor-assets' asset.game_id %}">Back to images</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+.room-scene {
+  position: relative;
+  width: min(100%, 960px);
+}
+
+.room-scene img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.room-scene:focus-visible {
+  outline: 3px solid #0d6efd;
+  outline-offset: 3px;
+}
+
+.player-marker {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #0d6efd;
+  box-shadow: 0 0 0 2px #212529;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: left 220ms linear, top 220ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-marker {
+    transition: none;
+  }
+}
+
+.room-exit,
+.room-hotspot {
+  position: absolute;
+  border: 2px solid #fff;
+  border-radius: 0.25rem;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.room-exit:hover,
+.room-exit:focus-visible,
+.room-hotspot:hover,
+.room-hotspot:focus-visible {
+  background: rgb(0 0 0 / 80%);
+  outline: 3px solid #ffc107;
+  outline-offset: 2px;
+}
+
+.room-hotspot {
+  border-style: dashed;
+  background: rgb(0 60 75 / 55%);
+}
+
+.inventory-item img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-right: 0.5rem;
+}

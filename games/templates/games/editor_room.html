@@ -1,0 +1,178 @@
+{% extends "games/editor_base.html" %}
+{% load static %}
+{% block title %}{{ room.name }} | SmartScumm editor{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <h1 class="h2 mb-0">{{ room.name }}</h1>
+  <nav aria-label="Room navigation">
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-rooms' room.game_id %}">All rooms</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-assets' room.game_id %}">Manage images</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-characters' room.game_id %}">Characters</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-items' room.game_id %}">Items</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-actions' room.game_id %}">Actions</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-flags' room.game_id %}">Flags</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'editor-readiness' room.game_id %}">Readiness</a>
+  </nav>
+</div>
+<div class="row g-4">
+  <section class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h2 class="h5 card-title">Room settings</h2>
+        <form method="post" class="editor-form">
+          {% csrf_token %}
+          {{ room_form.as_p }}
+          <button type="submit" class="btn btn-primary">Save room</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <section class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-body">
+        <h2 class="h5 card-title">Placement preview</h2>
+        {% if room.background %}
+          <p class="text-body-secondary">Choose a region type and drag on empty space to draw it. Drag an existing region to move it, or drag its corner handle to resize it. Save the corresponding form below. For keyboard access, focus a region or its handle and use arrow keys; numeric fields also work without JavaScript.</p>
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <label for="drawing-target" class="form-label mb-0">Draw a new</label>
+            <select id="drawing-target" class="form-select w-auto">
+              <option value="hotspot-new-form">Hotspot</option>
+              <option value="exit-new-form">Exit</option>
+            </select>
+            <span class="badge text-bg-success">Hotspot</span>
+            <span class="badge text-bg-warning">Exit</span>
+          </div>
+          <p id="drawing-status" role="status" class="small text-body-secondary">Drag to select a rectangular region.</p>
+          <div class="room-canvas" id="room-canvas">
+            <img src="{% url 'editor-asset-preview' room.game_id room.background_id %}" alt="Background of {{ room.name }}" draggable="false">
+            {% for entry in hotspots %}
+              <div class="region-box hotspot-box" data-region-form="hotspot-{{ entry.spot.pk }}-form" role="group" tabindex="0" aria-label="Move hotspot {{ entry.spot.label }} with arrow keys">
+                <span>{{ entry.spot.label }}</span>
+                <button type="button" class="resize-handle" aria-label="Resize hotspot {{ entry.spot.label }} with arrow keys"></button>
+              </div>
+            {% endfor %}
+            {% for entry in exits %}
+              <div class="region-box exit-box" data-region-form="exit-{{ entry.exit.pk }}-form" role="group" tabindex="0" aria-label="Move exit {{ entry.exit.label }} with arrow keys">
+                <span>{{ entry.exit.label }}</span>
+                <button type="button" class="resize-handle" aria-label="Resize exit {{ entry.exit.label }} with arrow keys"></button>
+              </div>
+            {% endfor %}
+            <div class="region-box pending-box" id="pending-region" hidden></div>
+          </div>
+        {% else %}
+          <p class="alert alert-info mb-0">Assign a background image in room settings to draw regions. Coordinates can also be entered manually below.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="row g-4 mt-1">
+  <section class="col-xl-6">
+    <h2 class="h4">Hotspots</h2>
+    <div class="card mb-3">
+      <div class="card-body">
+        <h3 class="h5 card-title">Add a hotspot</h3>
+        <form method="post" action="{% url 'editor-hotspot-create' room.game_id room.pk %}" id="hotspot-new-form" class="editor-form">
+          {% csrf_token %}
+          {{ hotspot_form.as_p }}
+          <button type="submit" class="btn btn-success">Add hotspot</button>
+        </form>
+      </div>
+    </div>
+    {% for entry in hotspots %}
+      <div class="card mb-3" id="hotspot-{{ entry.spot.pk }}">
+        <div class="card-body">
+          <h3 class="h5 card-title">{{ entry.spot.label }}</h3>
+          <form method="post" action="{% url 'editor-hotspot-edit' room.game_id room.pk entry.spot.pk %}" id="hotspot-{{ entry.spot.pk }}-form" class="editor-form">
+            {% csrf_token %}
+            {{ entry.form.as_p }}
+            <button type="submit" class="btn btn-outline-primary">Save hotspot</button>
+          </form>
+          <form method="post" action="{% url 'editor-hotspot-delete' room.game_id room.pk entry.spot.pk %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Delete hotspot</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </section>
+
+  <section class="col-xl-6">
+    <h2 class="h4">Exits</h2>
+    <div class="card mb-3">
+      <div class="card-body">
+        <h3 class="h5 card-title">Add an exit</h3>
+        <form method="post" action="{% url 'editor-exit-create' room.game_id room.pk %}" id="exit-new-form" class="editor-form">
+          {% csrf_token %}
+          {{ exit_form.as_p }}
+          <button type="submit" class="btn btn-warning">Add exit</button>
+        </form>
+      </div>
+    </div>
+    {% for entry in exits %}
+      <div class="card mb-3" id="exit-{{ entry.exit.pk }}">
+        <div class="card-body">
+          <h3 class="h5 card-title">{{ entry.exit.label }} to {{ entry.exit.target_room.name }}</h3>
+          <form method="post" action="{% url 'editor-exit-edit' room.game_id room.pk entry.exit.pk %}" id="exit-{{ entry.exit.pk }}-form" class="editor-form">
+            {% csrf_token %}
+            {{ entry.form.as_p }}
+            <button type="submit" class="btn btn-outline-primary">Save exit</button>
+          </form>
+          <form method="post" action="{% url 'editor-exit-delete' room.game_id room.pk entry.exit.pk %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Delete exit</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </section>
+</div>
+<section class="mt-4" id="room-dialogue">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="h4 mb-0">Dialogue</h2>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'editor-dialogue-preview' room.game_id room.pk %}">Preview sequence</a>
+  </div>
+  <p class="text-body-secondary">Lines play in order; an empty speaker is the narrator. Use the order field or the move buttons to change the sequence. Preview works for drafts.</p>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h3 class="h5 card-title">Add a line</h3>
+      <form method="post" action="{% url 'editor-dialogue-create' room.game_id room.pk %}" class="editor-form" id="dialogue-new-form">
+        {% csrf_token %}
+        {{ dialogue_form.as_p }}
+        <button type="submit" class="btn btn-primary">Add line</button>
+      </form>
+    </div>
+  </div>
+  <ol class="list-unstyled">
+    {% for entry in dialogue %}
+      <li class="card mb-3" id="dialogue-{{ entry.line.pk }}">
+        <div class="card-body">
+          <h3 class="h5 card-title">{{ forloop.counter }}. {{ entry.line.speaker.name|default:"Narrator" }}</h3>
+          <p class="card-text">{{ entry.line.text|linebreaksbr }}</p>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <form method="post" action="{% url 'editor-dialogue-move' room.game_id room.pk entry.line.pk 'up' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-secondary btn-sm" {% if forloop.first %}disabled{% endif %}>Move up</button>
+            </form>
+            <form method="post" action="{% url 'editor-dialogue-move' room.game_id room.pk entry.line.pk 'down' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-secondary btn-sm" {% if forloop.last %}disabled{% endif %}>Move down</button>
+            </form>
+          </div>
+          <form method="post" action="{% url 'editor-dialogue-edit' room.game_id room.pk entry.line.pk %}" class="editor-form">
+            {% csrf_token %}
+            {{ entry.form.as_p }}
+            <button type="submit" class="btn btn-outline-primary">Save line</button>
+          </form>
+          <form method="post" action="{% url 'editor-dialogue-delete' room.game_id room.pk entry.line.pk %}" class="mt-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Delete line</button>
+          </form>
+        </div>
+      </li>
+    {% endfor %}
+  </ol>
+</section>
+<script src="{% static 'games/editor_room.js' %}" defer></script>
+{% endblock %}

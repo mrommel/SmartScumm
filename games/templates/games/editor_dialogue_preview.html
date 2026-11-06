@@ -1,0 +1,22 @@
+{% extends "games/editor_base.html" %}
+{% block title %}Dialogue preview for {{ room.name }} | SmartScumm editor{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h2 mb-0">Dialogue preview: {{ room.name }}</h1>
+  <a class="btn btn-outline-secondary" href="{% url 'editor-room' room.game_id room.pk %}#room-dialogue">Back to room editor</a>
+</div>
+<p class="text-body-secondary">This is the current linear sequence, including draft lines. It is not a playable conversation or branching dialogue.</p>
+{% if room.background %}
+  <img class="img-fluid rounded mb-4" style="max-height: 20rem;" src="{% url 'editor-asset-preview' room.game_id room.background_id %}" alt="Background of {{ room.name }}">
+{% endif %}
+<ol class="list-group list-group-numbered">
+  {% for line in lines %}
+    <li class="list-group-item">
+      <strong>{{ line.speaker.name|default:"Narrator" }}</strong>
+      <p class="mb-0">{{ line.text|linebreaksbr }}</p>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No dialogue lines yet.</li>
+  {% endfor %}
+</ol>
+{% endblock %}

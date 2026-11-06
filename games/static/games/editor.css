@@ -1,0 +1,84 @@
+.editor-form p {
+  margin-bottom: 1rem;
+}
+
+.editor-form label {
+  display: block;
+  margin-bottom: .35rem;
+  font-weight: 500;
+}
+
+.editor-form .errorlist {
+  color: var(--bs-danger);
+  margin: .25rem 0;
+  padding-left: 1.25rem;
+}
+
+.room-canvas {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.room-canvas img {
+  display: block;
+  max-width: 100%;
+  max-height: 65vh;
+  pointer-events: none;
+}
+
+.region-box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid #087443;
+  background: #08744355;
+  cursor: move;
+  z-index: 1;
+}
+
+.region-box.selected, .region-box:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+  z-index: 2;
+}
+
+.exit-box {
+  border-color: #b13d16;
+  background: #b13d1655;
+}
+
+.pending-box {
+  border-color: #134bab;
+  background: #134bab55;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.region-box span {
+  background: white;
+  padding: 0 .25rem;
+  font-size: .8rem;
+  pointer-events: none;
+}
+
+.resize-handle {
+  position: absolute;
+  right: -9px;
+  bottom: -9px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid white;
+  border-radius: 3px;
+  background: #134bab;
+  cursor: nwse-resize;
+}
+
+.asset-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 10rem;
+  object-fit: contain;
+}

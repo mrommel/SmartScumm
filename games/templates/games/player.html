@@ -1,0 +1,46 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ game.title }} | SmartScumm</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'games/scummvm_icon.svg' %}">
+  <link rel="stylesheet" href="{% static 'games/vendor/bootstrap-5.3.8.min.css' %}">
+  <link rel="stylesheet" href="{% static 'games/player.css' %}">
+  <script src="{% static 'games/player_rules.js' %}" defer></script>
+  <script src="{% static 'games/player.js' %}" defer></script>
+</head>
+<body class="bg-body-tertiary">
+  <main class="container py-4" id="game-player" data-content-url="{{ content_url }}">
+    <h1 class="h2">{{ game.title }}</h1>
+    <p id="player-status" role="status">Loading adventure…</p>
+    <div class="mb-3">
+      <label for="verb-select" class="form-label">Action</label>
+      <select id="verb-select" class="form-select w-auto">
+        <option value="look">Look</option>
+        <option value="pick_up">Pick up</option>
+        <option value="use">Use</option>
+        <option value="talk">Talk</option>
+      </select>
+      <label for="input-item-select" class="form-label mt-2">Use with inventory item</label>
+      <select id="input-item-select" class="form-select w-auto" disabled>
+        <option value="">No item</option>
+      </select>
+    </div>
+    <section aria-label="Current room">
+      <h2 class="h4" id="room-name"></h2>
+      <div id="room-scene" class="room-scene" role="group" aria-label="Room movement area" aria-describedby="movement-help" tabindex="0"></div>
+      <p id="movement-help" class="text-body-secondary mt-2">Click the background to move the marker. Focus the room and use arrow keys to move in 5% steps. Select a verb and activate a hotspot to interact; select an exit to enter another room.</p>
+      <p id="player-position" class="visually-hidden" role="status"></p>
+      <p id="action-response" class="alert alert-info" role="status" aria-live="polite" hidden></p>
+    </section>
+    <section class="mt-4" aria-labelledby="inventory-title">
+      <h2 class="h4" id="inventory-title">Inventory</h2>
+      <p id="inventory-empty" class="text-body-secondary">No items yet.</p>
+      <ul id="inventory-items" class="list-unstyled d-flex flex-wrap gap-2" aria-live="polite" aria-relevant="additions"></ul>
+    </section>
+    <noscript>JavaScript is required to display this adventure.</noscript>
+  </main>
+</body>
+</html>
